@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صلاة المسافر · ألعاب تفاعلية</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   DESIGN DIRECTION: Islamic geometric luxury
+   Warm amber + deep teal on rich cream/ivory
+   Geometric patterns, ornate borders, gold leaf
+   Font: Amiri (display) + Cairo (UI)
+   Theme: Day-time warmth — light, refined, airy
+══════════════════════════════════════════ */
+
+:root {
+  --ink:     #1a0f00;
+  --amber:   #c8860a;
+  --amber2:  #f0b429;
+  --teal:    #0b7a6e;
+  --teal2:   #13a89a;
+  --cream:   #fdf6e8;
+  --parchment: #f5ead0;
+  --rose:    #c0392b;
+  --sage:    #3d7a52;
+  --sky:     #1565a8;
+  --gold-light: #fde68a;
+  --shadow:  rgba(26,15,0,0.14);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── GEOMETRIC BACKGROUND ── */
+body::before {
+  content:'';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(200,134,10,0.04) 0, rgba(200,134,10,0.04) 1px, transparent 1px, transparent 50%),
+    repeating-linear-gradient(-45deg, rgba(200,134,10,0.04) 0, rgba(200,134,10,0.04) 1px, transparent 1px, transparent 50%);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content:'';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(240,180,41,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 100% 100%, rgba(11,122,110,0.07) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── ORNAMENTAL HEADER ── */
+.hero {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 52px 24px 36px;
+  overflow: hidden;
+}
+.hero-inner {
+  display: inline-block;
+  position: relative;
+}
+.bismillah {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: var(--teal);
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+.hero h1 {
+  font-family: 'Amiri', serif;
+  font-size: clamp(2.6rem, 7vw, 4.5rem);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+  position: relative;
+}
+.hero h1 span.accent { color: var(--amber); }
+.hero-sub {
+  font-size: 0.95rem;
+  color: rgba(26,15,0,0.5);
+  margin-top: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+/* ornament line */
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 18px 0;
+}
+.ornament-line {
+  height: 2px;
+  width: 80px;
+  background: linear-gradient(90deg, transparent, var(--amber));
+}
+.ornament-line.rev { background: linear-gradient(90deg, var(--amber), transparent); }
+.ornament-diamond {
+  width: 10px; height: 10px;
+  background: var(--amber);
+  transform: rotate(45deg);
+  box-shadow: 0 0 12px rgba(200,134,10,0.5);
+}
+
+/* ── SCORE STRIP ── */
+.score-strip {
+  position: relative; z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 0 20px 28px;
+}
+.score-gem {
+  background: #fff;
+  border: 2px solid var(--amber);
+  border-radius: 16px;
+  padding: 10px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 16px rgba(200,134,10,0.15), inset 0 1px 0 rgba(255,255,255,0.8);
+  transition: transform 0.2s;
+}
+.score-gem:hover { transform: translateY(-2px); }
+.gem-icon { font-size: 1.3rem; }
+.gem-val { color: var(--amber); font-size: 1.15rem; font-weight: 900; }
+.timer-gem { border-color: var(--teal); }
+.timer-gem .gem-val { color: var(--teal); }
+.timer-gem.urgent { border-color: var(--rose); animation: urgentPulse 0.6s ease infinite alternate; }
+.timer-gem.urgent .gem-val { color: var(--rose); }
+@keyframes urgentPulse { from{box-shadow:0 4px 16px rgba(192,57,43,0.15)} to{box-shadow:0 4px 24px rgba(192,57,43,0.4)} }
+
+/* ── GAME NAV TABS ── */
+.nav-scroll {
+  position: relative; z-index: 2;
+  overflow-x: auto;
+  padding: 0 20px 24px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav-scroll::-webkit-scrollbar { display: none; }
+.nav-tabs {
+  display: flex;
+  gap: 10px;
+  width: max-content;
+  margin: 0 auto;
+}
+.nav-tab {
+  background: #fff;
+  border: 2px solid rgba(200,134,10,0.25);
+  border-radius: 50px;
+  padding: 11px 22px;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(26,15,0,0.55);
+  transition: all 0.25s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.nav-tab:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200,134,10,0.2);
+}
+.nav-tab.active {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(200,134,10,0.45);
+  transform: translateY(-2px);
+}
+.nav-tab.active .tab-icon { filter: brightness(0) invert(1); }
+
+/* ── MAIN GAME CONTAINER ── */
+.game-wrap {
+  position: relative; z-index: 2;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+/* ── GAME CARD BASE ── */
+.g-card {
+  background: #fff;
+  border: 1.5px solid rgba(200,134,10,0.18);
+  border-radius: 28px;
+  padding: 36px 32px;
+  box-shadow: 0 8px 40px rgba(26,15,0,0.09), 0 2px 0 rgba(200,134,10,0.1) inset;
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.g-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--teal), var(--amber), var(--teal2));
+}
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(24px) scale(0.97); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* corner ornament */
+.g-card::after {
+  content: '✦';
+  position: absolute;
+  top: 18px; left: 18px;
+  font-size: 1rem;
+  color: var(--amber);
+  opacity: 0.3;
+}
+
+/* ── PROGRESS BAR ── */
+.prog-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(26,15,0,0.45);
+}
+.prog-track {
+  height: 6px;
+  background: rgba(200,134,10,0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+.prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--amber));
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.prog-fill::after {
+  content:'';
+  position: absolute;
+  right: 0; top: 50%;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--amber);
+  transform: translateY(-50%);
+  box-shadow: 0 0 8px var(--amber);
+}
+
+/* ── QUESTION ── */
+.q-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, var(--amber), #e8980a);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 5px 14px;
+  border-radius: 99px;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 14px rgba(200,134,10,0.35);
+}
+.q-text-main {
+  font-family: 'Cairo', sans-serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--ink);
+  margin-bottom: 26px;
+}
+
+/* ── MCQ OPTIONS ── */
+.opts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width:520px) { .opts-grid { grid-template-columns: 1fr; } }
+
+.opt {
+  background: var(--cream);
+  border: 2px solid rgba(200,134,10,0.2);
+  border-radius: 16px;
+  padding: 14px 18px;
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: right;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.opt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(200,134,10,0.06), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.opt:hover:not(:disabled) {
+  border-color: var(--amber);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(200,134,10,0.2);
+}
+.opt:hover:not(:disabled)::before { opacity: 1; }
+.opt:disabled { cursor: default; }
+
+.opt-lbl {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: rgba(200,134,10,0.12);
+  color: var(--amber);
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.opt:hover:not(:disabled) .opt-lbl { background: var(--amber); color: #fff; }
+
+.opt.opt-correct {
+  background: rgba(61,122,82,0.08);
+  border-color: var(--sage);
+  box-shadow: 0 6px 20px rgba(61,122,82,0.2);
+  animation: correctBounce 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.opt.opt-correct .opt-lbl { background: var(--sage); color: #fff; }
+.opt.opt-wrong {
+  background: rgba(192,57,43,0.06);
+  border-color: var(--rose);
+}
+.opt.opt-wrong .opt-lbl { background: var(--rose); color: #fff; }
+@keyframes correctBounce { 0%{transform:scale(1)} 50%{transform:scale(1.04)} 100%{transform:scale(1)} }
+
+/* ── FEEDBACK BOX ── */
+.fb-box {
+  margin-top: 18px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+  display: none;
+  animation: slideUp 0.3s ease both;
+}
+.fb-box.show { display: flex; align-items: flex-start; gap: 12px; }
+.fb-box.fb-ok  { background: rgba(61,122,82,0.08);  border: 1.5px solid rgba(61,122,82,0.3);  color: #1e4d2b; }
+.fb-box.fb-err { background: rgba(192,57,43,0.07);  border: 1.5px solid rgba(192,57,43,0.3);  color: #7a1a12; }
+.fb-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+@keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── NEXT BUTTON ── */
+.btn-next {
+  display: none;
+  margin-top: 20px;
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  border: none;
+  border-radius: 14px;
+  padding: 15px 36px;
+  color: #fff;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 6px 20px rgba(11,122,110,0.3);
+  letter-spacing: 0.03em;
+}
+.btn-next.show { display: inline-flex; align-items: center; gap: 8px; }
+.btn-next:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(11,122,110,0.4); }
+
+/* ── TRUE/FALSE ── */
+.tf-q {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.7;
+  padding: 28px 16px;
+  color: var(--ink);
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.tf-btn {
+  border-radius: 20px;
+  padding: 26px 16px;
+  border: 2px solid;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.tf-t { background: rgba(61,122,82,0.06);  border-color: rgba(61,122,82,0.35); color: var(--sage); }
+.tf-f { background: rgba(192,57,43,0.06);  border-color: rgba(192,57,43,0.35); color: var(--rose); }
+.tf-btn:hover:not(:disabled) { transform: scale(1.04) translateY(-4px); }
+.tf-t:hover:not(:disabled) { background: rgba(61,122,82,0.15); box-shadow: 0 8px 28px rgba(61,122,82,0.2); }
+.tf-f:hover:not(:disabled) { background: rgba(192,57,43,0.13); box-shadow: 0 8px 28px rgba(192,57,43,0.2); }
+.tf-btn.tf-correct { background: rgba(61,122,82,0.18); border-color: var(--sage); box-shadow: 0 0 24px rgba(61,122,82,0.3); }
+.tf-btn.tf-wrong   { background: rgba(192,57,43,0.15); border-color: var(--rose); }
+.tf-btn:disabled { cursor: default; }
+.tf-big { font-size: 2rem; }
+
+/* ── DRAG DROP ── */
+.dd-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 18px;
+  background: var(--parchment);
+  border: 2px dashed rgba(200,134,10,0.3);
+  border-radius: 18px;
+  min-height: 72px;
+  margin-bottom: 22px;
+}
+.dd-chip {
+  background: #fff;
+  border: 2px solid rgba(200,134,10,0.3);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: grab;
+  transition: all 0.2s;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.dd-chip:hover { transform: scale(1.04) rotate(-1deg); border-color: var(--amber); box-shadow: 0 6px 18px rgba(200,134,10,0.2); }
+.dd-chip.dragging { opacity: 0.35; cursor: grabbing; }
+.dd-chip.chip-ok  { background: rgba(61,122,82,0.1);  border-color: var(--sage);  color: #1e4d2b; cursor: default; }
+.dd-chip.chip-err { background: rgba(192,57,43,0.08); border-color: var(--rose);  color: #7a1a12; cursor: default; }
+
+.dd-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:540px) { .dd-zones { grid-template-columns: 1fr; } }
+.dd-zone {
+  border: 2px dashed rgba(11,122,110,0.3);
+  border-radius: 18px;
+  padding: 16px;
+  min-height: 120px;
+  transition: all 0.25s;
+  background: rgba(11,122,110,0.03);
+}
+.dd-zone.over { background: rgba(11,122,110,0.1); border-color: var(--teal); border-style: solid; }
+.zone-lbl {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  display: inline-block;
+}
+
+/* ── FILL IN ── */
+.fill-wrap {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 400;
+  line-height: 2.2;
+  text-align: center;
+  padding: 24px 12px;
+  color: var(--ink);
+}
+.fill-blank {
+  display: inline-block;
+  border: none;
+  border-bottom: 3px solid var(--amber);
+  background: rgba(200,134,10,0.06);
+  color: var(--ink);
+  font-family: 'Cairo', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  width: 130px;
+  text-align: center;
+  outline: none;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s;
+  vertical-align: middle;
+}
+.fill-blank:focus { background: rgba(200,134,10,0.13); border-bottom-color: var(--teal); }
+.fill-blank.ok  { background: rgba(61,122,82,0.1);  border-bottom-color: var(--sage); color: var(--sage); }
+.fill-blank.err { background: rgba(192,57,43,0.07); border-bottom-color: var(--rose); color: var(--rose); }
+
+/* ── SCENARIO ── */
+.scene-banner {
+  background: linear-gradient(135deg, rgba(11,122,110,0.08), rgba(200,134,10,0.08));
+  border: 1.5px solid rgba(11,122,110,0.2);
+  border-radius: 20px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
+}
+.scene-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--teal);
+  background: rgba(11,122,110,0.1);
+  padding: 3px 12px;
+  border-radius: 99px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.scene-body {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.scene-q {
+  margin-top: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--amber);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── RESULT SCREEN ── */
+.result-wrap {
+  text-align: center;
+  padding: 40px 20px;
+  animation: cardIn 0.5s ease both;
+}
+.result-big { font-size: 5rem; margin-bottom: 10px; animation: bounceIn 0.6s ease both 0.2s; }
+@keyframes bounceIn {
+  0%{transform:scale(0) rotate(-20deg)} 60%{transform:scale(1.2) rotate(5deg)} 100%{transform:scale(1) rotate(0)}
+}
+.result-headline {
+  font-family: 'Amiri', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.result-pts {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--amber);
+  line-height: 1;
+  margin: 8px 0;
+  text-shadow: 0 4px 20px rgba(200,134,10,0.25);
+}
+.result-sub { color: rgba(26,15,0,0.5); font-size: 1rem; margin-bottom: 30px; font-weight: 600; }
+.btn-restart {
+  border: none; border-radius: 16px;
+  padding: 15px 32px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin: 6px;
+  letter-spacing: 0.03em;
+}
+.btn-primary { background: linear-gradient(135deg, var(--amber), #e8980a); color: #fff; box-shadow: 0 6px 20px rgba(200,134,10,0.4); }
+.btn-secondary { background: linear-gradient(135deg, var(--teal), var(--teal2)); color: #fff; box-shadow: 0 6px 20px rgba(11,122,110,0.35); }
+.btn-restart:hover { transform: translateY(-3px) scale(1.02); }
+
+/* stars row */
+.stars-row { display:flex; justify-content:center; gap:8px; margin:10px 0 20px; }
+.star-big { font-size: 2.4rem; opacity:0.2; transition: all 0.4s; }
+.star-big.lit { opacity:1; animation: starSpin 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes starSpin { from{transform:scale(0) rotate(-90deg)} to{transform:scale(1) rotate(0)} }
+
+/* ── CHECK BTN ── */
+.btn-check {
+  display: block;
+  margin: 20px auto 0;
+  background: linear-gradient(135deg, var(--amber), #e8980a);
+  border: none;
+  border-radius: 14px;
+  padding: 14px 38px;
+  color: #fff;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 6px 20px rgba(200,134,10,0.35);
+  letter-spacing: 0.03em;
+}
+.btn-check:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(200,134,10,0.45); }
+.btn-check:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+/* ── CONFETTI PARTICLE ── */
+.confetti { position:fixed; pointer-events:none; z-index:9999; animation: confettiFly 1.4s ease-out forwards; font-size:1.4rem; }
+@keyframes confettiFly {
+  0%   { opacity:1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity:0; transform: translateY(-140px) rotate(360deg) scale(0.3); }
+}
+
+/* ── COMBO TOAST ── */
+.combo-toast {
+  position: fixed;
+  top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
+  background: linear-gradient(135deg, var(--amber), #e8980a);
+  color: #fff;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 14px 28px;
+  border-radius: 50px;
+  box-shadow: 0 8px 30px rgba(200,134,10,0.5);
+  z-index: 9998;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  opacity: 0;
+  white-space: nowrap;
+}
+.combo-toast.show { transform: translateX(-50%) translateY(0); opacity:1; }
+
+/* ── SECTION TITLE ── */
+.section-hd {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.05rem; font-weight: 800; color: var(--teal);
+  margin-bottom: 16px; letter-spacing: 0.02em;
+}
+.section-hd::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(11,122,110,0.25),transparent); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px) { .g-card { padding: 24px 18px; } }
+</style>
+</head>
+<body>
+
+<div class="combo-toast" id="comboToast">🔥 رائع!</div>
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="bismillah">بسم الله الرحمن الرحيم</div>
+    <h1>صلاة <span class="accent">المسافر</span></h1>
+    <div class="ornament">
+      <div class="ornament-line rev"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line"></div>
+    </div>
+    <div class="hero-sub">الصف الخامس الابتدائي · القرآن الكريم والدراسات الإسلامية</div>
+  </div>
+</div>
+
+<!-- ══ SCORE ══ -->
+<div class="score-strip">
+  <div class="score-gem"><span class="gem-icon">🏆</span> النقاط <span class="gem-val" id="gs-pts">0</span></div>
+  <div class="score-gem"><span class="gem-icon">✅</span> صحيح <span class="gem-val" id="gs-cor">0</span></div>
+  <div class="score-gem timer-gem" id="timerGem"><span class="gem-icon">⏱</span> الوقت <span class="gem-val" id="gs-time">—</span></div>
+</div>
+
+<!-- ══ NAV TABS ══ -->
+<div class="nav-scroll">
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchGame(0)"><span>🎯</span> اختر الإجابة</button>
+    <button class="nav-tab" onclick="switchGame(1)"><span>⚡</span> صح أم خطأ</button>
+    <button class="nav-tab" onclick="switchGame(2)"><span>🧩</span> صنّف الصلوات</button>
+    <button class="nav-tab" onclick="switchGame(3)"><span>✍️</span> أكمل الجملة</button>
+    <button class="nav-tab" onclick="switchGame(4)"><span>🗺️</span> سيناريوهات</button>
+  </div>
+</div>
+
+<!-- ══ GAME AREA ══ -->
+<div class="game-wrap" id="gameArea"></div>
+
+<script>
+/* ════ GLOBAL STATE ════ */
+let gScore = 0, gCorrect = 0, combo = 0;
+let timerID = null, timeLeft = 0;
+
+const $ = id => document.getElementById(id);
+
+function refreshScore() {
+  $('gs-pts').textContent = gScore;
+  $('gs-cor').textContent = gCorrect;
+}
+
+function addPoints(p) {
+  gScore += p; gCorrect++; combo++;
+  refreshScore();
+  burst();
+  if (combo >= 3) showCombo();
+}
+function miss() { combo = 0; }
+
+function showCombo() {
+  const msgs = ['🔥 رائع!','💫 ممتاز!','🌟 استمر!','🚀 لا يُصدَّق!'];
+  const t = $('comboToast');
+  t.textContent = msgs[Math.min(combo-3, msgs.length-1)];
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1600);
+}
+
+function burst() {
+  const emojis = ['✨','⭐','🌟','💛','🎊','🏅'];
+  for (let i = 0; i < 7; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left  = (15 + Math.random()*70) + 'vw';
+    el.style.top   = (35 + Math.random()*25) + 'vh';
+    el.style.animationDelay = (i*0.08) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1800);
+  }
+}
+
+/* TIMER */
+function startT(secs) {
+  stopT();
+  timeLeft = secs;
+  const el = $('gs-time'), gem = $('timerGem');
+  el.textContent = timeLeft; gem.classList.remove('urgent');
+  timerID = setInterval(() => {
+    timeLeft--;
+    el.textContent = timeLeft;
+    if (timeLeft <= 5) gem.classList.add('urgent');
+    if (timeLeft <= 0) { stopT(); el.textContent = '0'; }
+  }, 1000);
+}
+function stopT() {
+  clearInterval(timerID);
+  $('gs-time').textContent = '—';
+  $('timerGem').classList.remove('urgent');
+}
+
+/* SWITCH GAME */
+function switchGame(idx) {
+  stopT();
+  document.querySelectorAll('.nav-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  [startMCQ, startTF, startDD, startFill, startScene][idx]();
+}
+
+/* ════ GAME 1 · MCQ ════ */
+const MCQS = [
+  { q:'ما هي المسافة التي يجوز للمسافر أن يبدأ عندها قصر الصلاة؟', o:['٢٠ كيلومتر','٥٠ كيلومتر','٨٠ كيلومتر تقريباً','١٥٠ كيلومتر'], a:2, e:'حددها العلماء بما يعادل ٨٠ كيلومتراً تقريباً.' },
+  { q:'ما حكم قصر الصلاة الرباعية للمسافر؟', o:['واجب','سنة مؤكدة','مباح فقط','مكروه'], a:1, e:'القصر سنة مؤكدة فعلها النبي ﷺ في جميع أسفاره.' },
+  { q:'أيٌّ من الصلوات التالية لا يجوز قصرها في السفر؟', o:['الظهر','العصر','المغرب','العشاء'], a:2, e:'المغرب ثلاث ركعات أصلاً، فليست رباعية.' },
+  { q:'متى يبدأ المسافر بقصر الصلاة؟', o:['من بيته','عند مغادرة حدود المدينة','بعد قطع ٢٠ كم','بعد أن ينوي السفر'], a:1, e:'يبدأ القصر بعد مفارقة آخر بيوت المدينة العامرة.' },
+  { q:'إذا صلّى مسافر خلف إمام مقيم، فإنه:', o:['يقصر الصلاة ويسلم','يتم أربع ركعات مع الإمام','يصلي بنية مستقلة','يجلس ويتشهد بعد ركعتين'], a:1, e:'يتبع الإمام المقيم ويُتم الصلاة أربع ركعات.' },
+  { q:'ما الصلوات التي يمكن الجمع بينها في السفر؟', o:['الفجر والظهر','العصر والمغرب','الظهر والعصر','المغرب والفجر'], a:2, e:'الجمع المشروع: الظهر مع العصر، والمغرب مع العشاء.' },
+  { q:'جمع التقديم هو:', o:['تأخير الأولى لوقت الثانية','أداء الثانية في وقت الأولى','ترك الأولى والاكتفاء بالثانية','جمع صلاتين في منتصف الوقتين'], a:1, e:'جمع التقديم: أداء الصلاة الثانية في وقت الأولى.' },
+  { q:'صلاة الفجر للمسافر:', o:['تُصلى ركعة واحدة','تُقصر إلى ركعة','تبقى ركعتين ولا تُقصر','تُجمع مع الظهر'], a:2, e:'الفجر ركعتان أصلاً فلا قصر فيها.' },
+  { q:'المقيم خلف إمام مسافر:', o:['يسلم معه بعد ركعتين','يُتم صلاته بعد سلام الإمام','يخرج ويعيد الصلاة','يختصر الصلاة'], a:1, e:'يُكمل المقيم ركعتين إضافيتين بعد سلام الإمام المسافر.' },
+  { q:'متى تنتهي رخصة القصر للمسافر؟', o:['بعد ثلاثة أيام','عند وصول مدينة أخرى','عند دخول حدود بلده','بعد صلاة واحدة'], a:2, e:'تنتهي الرخصة فور دخول حدود مدينته.' },
+];
+
+let mIdx=0, mScore=0, mDone=false;
+function startMCQ() { mIdx=0; mScore=0; mDone=false; renderMCQQ(); }
+function renderMCQQ() {
+  if (mIdx >= MCQS.length) { renderMCQEnd(); return; }
+  const q = MCQS[mIdx];
+  const pct = (mIdx/MCQS.length)*100;
+  startT(30);
+  $('gameArea').innerHTML = `
+    <div class="g-card">
+      <div class="prog-row"><span>السؤال ${mIdx+1} من ${MCQS.length}</span><span>النقاط: ${mScore}</span></div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:${pct}%"></div></div>
+      <div class="q-badge">❓ سؤال ${mIdx+1}</div>
+      <div class="q-text-main">${q.q}</div>
+      <div class="opts-grid">
+        ${q.o.map((o,i)=>`
+          <button class="opt" id="op${i}" onclick="pickMCQ(${i})">
+            <span class="opt-lbl">${['أ','ب','ج','د'][i]}</span>${o}
+          </button>`).join('')}
+      </div>
+      <div class="fb-box" id="fb"></div>
+      <button class="btn-next" id="nxt" onclick="nextMCQ()">التالي &larr;</button>
+    </div>`;
+}
+function pickMCQ(i) {
+  if (mDone) return; mDone=true; stopT();
+  const q=MCQS[mIdx], fb=$('fb'), nxt=$('nxt');
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  if (i===q.a) {
+    $('op'+i).classList.add('opt-correct');
+    fb.className='fb-box show fb-ok';
+    fb.innerHTML=`<span class="fb-icon">✅</span><span>${q.e}</span>`;
+    mScore+=10; addPoints(10);
+  } else {
+    $('op'+i).classList.add('opt-wrong');
+    $('op'+q.a).classList.add('opt-correct');
+    fb.className='fb-box show fb-err';
+    fb.innerHTML=`<span class="fb-icon">❌</span><span>الإجابة الصحيحة: <strong>${q.o[q.a]}</strong>. ${q.e}</span>`;
+    miss();
+  }
+  nxt.classList.add('show');
+}
+function nextMCQ() { mIdx++; mDone=false; renderMCQQ(); }
+function renderMCQEnd() {
+  stopT();
+  const p=Math.round(mScore/100*100);
+  $('gameArea').innerHTML=`
+    <div class="g-card result-wrap">
+      <div class="result-big">${p>=80?'🏆':p>=60?'😊':'📖'}</div>
+      <div class="result-headline">${p>=80?'أحسنت!':p>=60?'جيد جداً!':'حاول مرة أخرى'}</div>
+      <div class="result-pts">${mScore} <span style="font-size:1.5rem;color:rgba(26,15,0,0.3)">/ 100</span></div>
+      <div class="result-sub">${p>=80?'أتقنت درس صلاة المسافر':p>=60?'راجع بعض النقاط':'المراجعة تُعلّم'}</div>
+      <div class="stars-row">
+        ${[20,50,80].map((t,i)=>`<span class="star-big ${p>=t?'lit':''}" style="animation-delay:${i*0.15}s">⭐</span>`).join('')}
+      </div>
+      <button class="btn-restart btn-primary" onclick="startMCQ()">🔄 أعد اللعب</button>
+      <button class="btn-restart btn-secondary" onclick="switchGame(1)">التالي ⚡</button>
+    </div>`;
+}
+
+/* ════ GAME 2 · TRUE/FALSE ════ */
+const TFS = [
+  { s:'يجوز للمسافر قصر صلاة المغرب إلى ركعتين في السفر.', a:false, e:'المغرب ثلاث ركعات وليست رباعية فلا تُقصر أبداً.' },
+  { s:'القصر سنة مؤكدة فعلها النبي ﷺ في جميع أسفاره.', a:true, e:'نعم، هذا ثابت بالحديث الصحيح.' },
+  { s:'تبدأ رخصة القصر بمجرد خروج المسافر من باب بيته.', a:false, e:'تبدأ عند مفارقة آخر بيوت المدينة العامرة.' },
+  { s:'يجوز للمسافر جمع صلاة الظهر مع صلاة العصر.', a:true, e:'نعم، هذا من رُخَص السفر التي أباحها الله.' },
+  { s:'المسافر الذي يصلي خلف إمام مقيم يصلي ركعتين فقط.', a:false, e:'يجب أن يتبع الإمام ويُتم أربع ركعات.' },
+  { s:'صلاة الفجر لا تُقصر في السفر لأنها ركعتان أصلاً.', a:true, e:'صحيح تماماً، الفجر ركعتان فلا مجال للقصر.' },
+  { s:'يمكن للمسافر جمع صلاة الفجر مع صلاة الظهر.', a:false, e:'الجمع خاص بالظهر/العصر والمغرب/العشاء فقط.' },
+  { s:'جمع التأخير هو تأخير الصلاة الأولى لتُصلى مع الثانية في وقتها.', a:true, e:'هذا هو التعريف الصحيح لجمع التأخير.' },
+];
+
+let tIdx=0, tScore=0;
+function startTF() { tIdx=0; tScore=0; renderTFQ(); }
+function renderTFQ() {
+  if (tIdx>=TFS.length) { renderTFEnd(); return; }
+  const q=TFS[tIdx];
+  startT(20);
+  $('gameArea').innerHTML=`
+    <div class="g-card">
+      <div class="prog-row"><span>السؤال ${tIdx+1} من ${TFS.length}</span><span>النقاط: ${tScore}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${(tIdx/TFS.length)*100}%"></div></div>
+      <div class="q-badge">⚡ صح أم خطأ؟</div>
+      <div class="tf-q">${q.s}</div>
+      <div class="tf-grid">
+        <button class="tf-btn tf-t" id="tfT" onclick="pickTF(true)"><span class="tf-big">✅</span>صحيح</button>
+        <button class="tf-btn tf-f" id="tfF" onclick="pickTF(false)"><span class="tf-big">❌</span>خطأ</button>
+      </div>
+      <div class="fb-box" id="fb"></div>
+      <div style="text-align:center"><button class="btn-next" id="nxt" onclick="nextTF()">التالي &larr;</button></div>
+    </div>`;
+}
+function pickTF(v) {
+  stopT();
+  const q=TFS[tIdx], fb=$('fb'), nxt=$('nxt');
+  $('tfT').disabled=$('tfF').disabled=true;
+  const hit = v===q.a;
+  if (hit) {
+    (v?$('tfT'):$('tfF')).classList.add('tf-correct');
+    fb.className='fb-box show fb-ok';
+    fb.innerHTML=`<span class="fb-icon">✅</span><span>${q.e}</span>`;
+    tScore+=12; addPoints(12);
+  } else {
+    (v?$('tfT'):$('tfF')).classList.add('tf-wrong');
+    (q.a?$('tfT'):$('tfF')).classList.add('tf-correct');
+    fb.className='fb-box show fb-err';
+    fb.innerHTML=`<span class="fb-icon">❌</span><span>${q.e}</span>`;
+    miss();
+  }
+  nxt.classList.add('show');
+}
+function nextTF() { tIdx++; renderTFQ(); }
+function renderTFEnd() {
+  stopT();
+  const p=Math.round(tScore/96*100);
+  $('gameArea').innerHTML=`
+    <div class="g-card result-wrap">
+      <div class="result-big">${p>=80?'🌟':'📚'}</div>
+      <div class="result-headline">${p>=80?'ممتاز!':'جيد، واصل!'}</div>
+      <div class="result-pts">${tScore} <span style="font-size:1.5rem;color:rgba(26,15,0,0.3)">/ 96</span></div>
+      <div class="stars-row">
+        ${[25,55,85].map((t,i)=>`<span class="star-big ${p>=t?'lit':''}" style="animation-delay:${i*0.15}s">⭐</span>`).join('')}
+      </div>
+      <button class="btn-restart btn-primary" onclick="startTF()">🔄 أعد اللعب</button>
+      <button class="btn-restart btn-secondary" onclick="switchGame(2)">التالي 🧩</button>
+    </div>`;
+}
+
+/* ════ GAME 3 · DRAG & DROP ════ */
+const DD_ITEMS = [
+  {t:'الظهر', z:'قابل للقصر'},
+  {t:'العصر', z:'قابل للقصر'},
+  {t:'العشاء', z:'قابل للقصر'},
+  {t:'الفجر',  z:'لا يُقصر'},
+  {t:'المغرب', z:'لا يُقصر'},
+  {t:'الظهر مع العصر', z:'يجوز الجمع'},
+  {t:'المغرب مع العشاء', z:'يجوز الجمع'},
+  {t:'الفجر مع الظهر', z:'لا يجوز الجمع'},
+  {t:'العصر مع المغرب', z:'لا يجوز الجمع'},
+];
+const DD_ZONES = [
+  {name:'قابل للقصر', color:'#0b7a6e', bg:'rgba(11,122,110,0.06)'},
+  {name:'لا يُقصر',   color:'#c0392b', bg:'rgba(192,57,43,0.06)'},
+  {name:'يجوز الجمع', color:'#3d7a52', bg:'rgba(61,122,82,0.06)'},
+  {name:'لا يجوز الجمع', color:'#c8860a', bg:'rgba(200,134,10,0.06)'},
+];
+let ddDrag=null;
+
+function startDD() {
+  const shuffled=[...DD_ITEMS].sort(()=>Math.random()-0.5);
+  $('gameArea').innerHTML=`
+    <div class="g-card">
+      <div class="section-hd">🧩 صنّف كل بطاقة في المكان الصحيح</div>
+      <p style="font-size:0.85rem;color:rgba(26,15,0,0.45);margin-bottom:16px;font-weight:600">اسحب كل بطاقة إلى التصنيف المناسب</p>
+      <div class="dd-pool" id="ddPool">
+        ${shuffled.map((it,i)=>`
+          <div class="dd-chip" draggable="true" id="ddc${i}" data-zone="${it.z}" data-txt="${it.t}"
+               ondragstart="ddDrag=event.target.id;event.dataTransfer.effectAllowed='move'"
+               ontouchstart="ddTS(event,'ddc${i}')"
+               ontouchmove="ddTM(event)"
+               ontouchend="ddTE(event,'ddc${i}')">${it.t}</div>`).join('')}
+      </div>
+      <div class="dd-zones">
+        ${DD_ZONES.map(z=>`
+          <div class="dd-zone" id="ddz-${z.name}" style="background:${z.bg};border-color:${z.color}33"
+               ondragover="event.preventDefault();this.classList.add('over')"
+               ondragleave="this.classList.remove('over')"
+               ondrop="ddDrop(event,'${z.name}')">
+            <div class="zone-lbl" style="background:${z.color}18;color:${z.color}">${z.name}</div>
+          </div>`).join('')}
+      </div>
+      <button class="btn-check" onclick="checkDD()">تحقق من الإجابات ✓</button>
+    </div>`;
+}
+function ddDrop(e,zone) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('over');
+  if (!ddDrag) return;
+  const el=document.getElementById(ddDrag);
+  if (el) e.currentTarget.appendChild(el);
+  ddDrag=null;
+}
+let _tc=null;
+function ddTS(e,id) {
+  ddDrag=id;
+  const el=document.getElementById(id);
+  const clone=el.cloneNode(true);
+  clone.style.cssText='position:fixed;z-index:9999;opacity:0.85;pointer-events:none;transform:scale(1.08) rotate(-2deg)';
+  document.body.appendChild(clone); _tc=clone;
+  _mv(e.touches[0]);
+}
+function ddTM(e) { e.preventDefault(); if(_tc) _mv(e.touches[0]); }
+function _mv(t) { if(!_tc) return; _tc.style.left=(t.clientX-50)+'px'; _tc.style.top=(t.clientY-20)+'px'; }
+function ddTE(e,id) {
+  if(_tc){_tc.remove();_tc=null;}
+  const t=e.changedTouches[0];
+  const hit=document.elementFromPoint(t.clientX,t.clientY);
+  const zone=hit&&hit.closest('.dd-zone');
+  if(zone) { const el=document.getElementById(id); if(el) zone.appendChild(el); }
+  ddDrag=null;
+}
+function checkDD() {
+  let ok=0,tot=0;
+  document.querySelectorAll('.dd-chip').forEach(c=>{
+    const z=c.closest('.dd-zone'); if(!z) return;
+    tot++;
+    const zn=z.querySelector('.zone-lbl').textContent;
+    c.classList.add(c.dataset.zone===zn?'chip-ok':'chip-err');
+    if(c.dataset.zone===zn) ok++;
+  });
+  if(!tot){alert('اسحب البطاقات أولاً!');return;}
+  const pts=ok*9; addPoints(pts);
+  const fb=document.createElement('div');
+  fb.className=`fb-box show ${ok===tot?'fb-ok':'fb-err'}`;
+  fb.innerHTML=`<span class="fb-icon">${ok===tot?'✅':'📊'}</span><span>${ok===tot?'ممتاز! كل الإجابات صحيحة':ok+' من '+tot+' صحيح'}  (+${pts} نقطة)</span>`;
+  document.querySelector('.btn-check').before(fb);
+  document.querySelector('.btn-check').disabled=true;
+}
+
+/* ════ GAME 4 · FILL IN ════ */
+const FILLS = [
+  { pre:'الصلوات الرباعية التي تُقصر هي: ', suf:' والعصر والعشاء.', ans:'الظهر', ph:'الصلاة الأولى' },
+  { pre:'المسافة المطلوبة للقصر حوالي ', suf:' كيلومتراً أو أكثر.', ans:'80', ph:'العدد' },
+  { pre:'يبدأ القصر عند مفارقة ', suf:' المدينة العامرة.', ans:'بيوت', ph:'كلمة' },
+  { pre:'جمع المغرب مع العشاء في وقت المغرب يُسمى جمع ', suf:'.', ans:'تقديم', ph:'نوع الجمع' },
+  { pre:'المسافر خلف إمام مقيم يُصلي ', suf:' ركعات كاملة.', ans:'أربع', ph:'العدد بالكلمات' },
+  { pre:'صلاة الفجر ', suf:' تُقصر لأنها ركعتان أصلاً.', ans:'لا', ph:'نعم/لا' },
+];
+let fIdx=0, fScore=0;
+function startFill() { fIdx=0; fScore=0; renderFillQ(); }
+function renderFillQ() {
+  if(fIdx>=FILLS.length){renderFillEnd();return;}
+  const q=FILLS[fIdx];
+  startT(25);
+  $('gameArea').innerHTML=`
+    <div class="g-card">
+      <div class="prog-row"><span>السؤال ${fIdx+1} من ${FILLS.length}</span><span>النقاط: ${fScore}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${(fIdx/FILLS.length)*100}%"></div></div>
+      <div class="q-badge">✍️ أكمل الجملة</div>
+      <div class="fill-wrap">
+        ${q.pre}<input class="fill-blank" id="fi" placeholder="${q.ph}" onkeydown="if(event.key==='Enter')chkFill()">${q.suf}
+      </div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="btn-check" onclick="chkFill()">تحقق ✓</button>
+      </div>
+      <div class="fb-box" id="fb"></div>
+      <div style="text-align:center"><button class="btn-next" id="nxt" onclick="nextFill()">التالي &larr;</button></div>
+    </div>`;
+  setTimeout(()=>$('fi').focus(),100);
+}
+function chkFill() {
+  const q=FILLS[fIdx], inp=$('fi'), fb=$('fb'), nxt=$('nxt');
+  const v=inp.value.trim();
+  inp.disabled=true; stopT();
+  document.querySelector('.btn-check').disabled=true;
+  if(v.toLowerCase()===q.ans.toLowerCase()||v===q.ans){
+    inp.classList.add('ok');
+    fb.className='fb-box show fb-ok';
+    fb.innerHTML='<span class="fb-icon">✅</span><span>إجابة صحيحة!</span>';
+    fScore+=15; addPoints(15);
+  } else {
+    inp.classList.add('err');
+    fb.className='fb-box show fb-err';
+    fb.innerHTML=`<span class="fb-icon">❌</span><span>الإجابة: <strong>${q.ans}</strong></span>`;
+    miss();
+  }
+  nxt.classList.add('show');
+}
+function nextFill() { fIdx++; renderFillQ(); }
+function renderFillEnd() {
+  stopT();
+  const p=Math.round(fScore/90*100);
+  $('gameArea').innerHTML=`
+    <div class="g-card result-wrap">
+      <div class="result-big">${p>=80?'🏅':'📚'}</div>
+      <div class="result-headline">${p>=80?'أحسنت!':'واصل التدريب!'}</div>
+      <div class="result-pts">${fScore} <span style="font-size:1.5rem;color:rgba(26,15,0,0.3)">/ 90</span></div>
+      <div class="stars-row">
+        ${[25,55,85].map((t,i)=>`<span class="star-big ${p>=t?'lit':''}" style="animation-delay:${i*0.15}s">⭐</span>`).join('')}
+      </div>
+      <button class="btn-restart btn-primary" onclick="startFill()">🔄 أعد اللعب</button>
+      <button class="btn-restart btn-secondary" onclick="switchGame(4)">التالي 🗺️</button>
+    </div>`;
+}
+
+/* ════ GAME 5 · SCENARIOS ════ */
+const SCENES = [
+  { tag:'🚗 سيناريو ١', body:'سافر خالد من الرياض إلى مدينة تبعد ٦٠ كيلومتراً.', q:'هل يجوز لخالد أن يقصر الصلاة؟', o:['نعم، يجوز','لا، المسافة أقل من ٨٠ كم','يجوز لكن مكروه','يسأل الإمام'], a:1, e:'المسافة ٦٠ كم أقل من الحد المطلوب (٨٠ كم) فلا يجوز القصر.' },
+  { tag:'🏙️ سيناريو ٢', body:'نوى محمد السفر ولا يزال في بيته، وحان وقت الظهر.', q:'كيف يُصلي محمد الظهر؟', o:['ركعتين قصراً','أربع ركعات كاملة','يجمعها مع العصر','ينتظر حتى يغادر المدينة'], a:1, e:'القصر يبدأ بعد مفارقة عمران البلد، وهو لم يفارقه بعد.' },
+  { tag:'🕌 سيناريو ٣', body:'سافر سعد ١٠٠ كم ووجد مسجداً وإمامه مقيم يُصلي العصر.', q:'كم ركعة يُصلي سعد مع هذا الإمام؟', o:['ركعتين','ثلاثاً','أربعاً كاملة','يصلي وحده'], a:2, e:'المسافر خلف الإمام المقيم يتبعه ويُتم أربع ركعات.' },
+  { tag:'✈️ سيناريو ٤', body:'وصل أحمد المطار وقت أذان الظهر وسيقلع بعد ساعة، وقد فارق عمران بلده.', q:'هل يجوز له جمع الظهر مع العصر الآن؟', o:['لا، لم يسافر بعد','نعم، جمع تقديم','يصلي الظهر ويؤخر العصر','لا يُصلي في المطار'], a:1, e:'نعم، قد فارق العمران فله جمع التقديم.' },
+  { tag:'🌙 سيناريو ٥', body:'يسافر عمر ليلاً ويريد صلاة المغرب والعشاء معاً في وقت العشاء.', q:'ما اسم هذا النوع من الجمع؟', o:['جمع تقديم','جمع تأخير','جمع اضطراري','قصر وجمع'], a:1, e:'جمع التأخير: تأخير المغرب لتُصلى مع العشاء في وقتها.' },
+];
+let sIdx=0, sScore=0, sDone=false;
+function startScene() { sIdx=0; sScore=0; sDone=false; renderSceneQ(); }
+function renderSceneQ() {
+  if(sIdx>=SCENES.length){renderSceneEnd();return;}
+  const s=SCENES[sIdx];
+  startT(35);
+  $('gameArea').innerHTML=`
+    <div class="g-card">
+      <div class="prog-row"><span>${s.tag}</span><span>النقاط: ${sScore}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${(sIdx/SCENES.length)*100}%"></div></div>
+      <div class="scene-banner">
+        <div class="scene-tag">📖 القصة</div>
+        <div class="scene-body">${s.body}</div>
+        <div class="scene-q">❓ ${s.q}</div>
+      </div>
+      <div class="opts-grid">
+        ${s.o.map((o,i)=>`
+          <button class="opt" id="so${i}" onclick="pickScene(${i})">
+            <span class="opt-lbl">${['أ','ب','ج','د'][i]}</span>${o}
+          </button>`).join('')}
+      </div>
+      <div class="fb-box" id="fb"></div>
+      <button class="btn-next" id="nxt" onclick="nextScene()">التالي &larr;</button>
+    </div>`;
+}
+function pickScene(i) {
+  if(sDone)return; sDone=true; stopT();
+  const s=SCENES[sIdx], fb=$('fb'), nxt=$('nxt');
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  if(i===s.a){
+    $('so'+i).classList.add('opt-correct');
+    fb.className='fb-box show fb-ok';
+    fb.innerHTML=`<span class="fb-icon">✅</span><span>${s.e}</span>`;
+    sScore+=20; addPoints(20);
+  } else {
+    $('so'+i).classList.add('opt-wrong');
+    $('so'+s.a).classList.add('opt-correct');
+    fb.className='fb-box show fb-err';
+    fb.innerHTML=`<span class="fb-icon">❌</span><span>الإجابة: <strong>${s.o[s.a]}</strong>. ${s.e}</span>`;
+    miss();
+  }
+  nxt.classList.add('show');
+}
+function nextScene() { sIdx++; sDone=false; renderSceneQ(); }
+function renderSceneEnd() {
+  stopT();
+  const p=Math.round(sScore/100*100);
+  $('gameArea').innerHTML=`
+    <div class="g-card result-wrap">
+      <div class="result-big">${p>=80?'🌟':'📖'}</div>
+      <div class="result-headline">${p>=80?'بارك الله فيك!':'استمر في التعلم!'}</div>
+      <div class="result-pts">${sScore} <span style="font-size:1.5rem;color:rgba(26,15,0,0.3)">/ 100</span></div>
+      <div class="stars-row">
+        ${[25,55,85].map((t,i)=>`<span class="star-big ${p>=t?'lit':''}" style="animation-delay:${i*0.15}s">⭐</span>`).join('')}
+      </div>
+      <button class="btn-restart btn-primary" onclick="startScene()">🔄 أعد اللعب</button>
+      <button class="btn-restart btn-secondary" onclick="switchGame(0)">من البداية 🎯</button>
+    </div>`;
+}
+
+/* ════ INIT ════ */
+startMCQ();
+</script>
+</body>
+</html>
